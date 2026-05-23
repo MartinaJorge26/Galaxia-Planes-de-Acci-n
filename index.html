@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxia — Planes de Acción · Del Palacio S.A.</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#F4F6FA;padding-bottom:2rem}
+.header{background:#1A1A2E;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.h-brand{display:flex;align-items:center;gap:12px}
+.h-logo{width:40px;height:40px;background:#534AB7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.h-title{font-size:17px;font-weight:700;color:#fff}
+.h-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+.tabs{background:#fff;border-bottom:1px solid #E5E9F0;display:flex;padding:0 20px;gap:2px;overflow-x:auto;position:sticky;top:0;z-index:100}
+.tab{padding:13px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:#8A94A6;border-bottom:3px solid transparent;white-space:nowrap}
+.tab.on{color:#534AB7;border-bottom-color:#534AB7}
+.sec{padding:20px;max-width:1200px;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:#fff;border-radius:10px;padding:16px;border-left:4px solid #ccc;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.kpi-n{font-size:30px;font-weight:700}
+.kpi-l{font-size:10px;color:#8A94A6;margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.kpi-s{font-size:11px;margin-top:3px;font-weight:600}
+.km{border-left-color:#534AB7}.km .kpi-n{color:#534AB7}
+.kv{border-left-color:#16A34A}.kv .kpi-n{color:#16A34A}
+.kc{border-left-color:#0369A1}.kc .kpi-n{color:#0369A1}
+.kp{border-left-color:#EA580C}.kp .kpi-n{color:#EA580C}
+.kd{border-left-color:#DC2626}.kd .kpi-n{color:#DC2626}
+.kg{border-left-color:#64748B}.kg .kpi-n{color:#64748B}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:#fff;border-radius:10px;padding:18px;border:0.5px solid #E5E9F0;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card-hdr{font-size:11px;font-weight:700;color:#8A94A6;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.resp-card{background:#fff;border-radius:10px;border:0.5px solid #E5E9F0;overflow:hidden;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.resp-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid #F1F5F9;flex-wrap:wrap;gap:10px}
+.resp-avatar{width:40px;height:40px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.resp-nombre{font-size:14px;font-weight:700;color:#1E293B}
+.resp-sub{font-size:11px;color:#8A94A6;margin-top:1px}
+.resp-stats{display:flex;gap:16px}
+.rstat{text-align:center}
+.rstat-n{font-size:20px;font-weight:700}
+.rstat-l{font-size:9px;text-transform:uppercase;font-weight:700;color:#8A94A6;letter-spacing:.04em;margin-top:1px}
+.prog-bar{height:5px;background:#F1F5F9;margin:0 16px;overflow:hidden}
+.prog-fill{height:100%;background:#534AB7;transition:width .4s}
+.pda-item{padding:13px 16px;border-bottom:0.5px solid #F8FAFC}
+.pda-item:last-child{border-bottom:none}
+.pda-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.pda-tema{font-size:12px;font-weight:700;color:#475569;margin-bottom:4px}
+.pda-titulo{font-size:13px;font-weight:600;color:#1E293B}
+.pda-desc{font-size:12px;color:#64748B;margin-top:3px;line-height:1.5}
+.pda-meta{display:flex;gap:12px;margin-top:8px;font-size:11px;color:#94A3B8;flex-wrap:wrap;padding-top:8px;border-top:0.5px solid #F8FAFC}
+.badges{display:flex;gap:5px;flex-shrink:0;align-items:center;flex-wrap:wrap}
+.badge{display:inline-block;font-size:10px;padding:2px 9px;border-radius:12px;font-weight:700}
+.bf{background:#DCFCE7;color:#14532D}.bc{background:#DBEAFE;color:#1E40AF}
+.bd{background:#FEE2E2;color:#7F1D1D}.bp{background:#F1F5F9;color:#475569}
+.ba{background:#FEE2E2;color:#7F1D1D}.bm{background:#FEF9C3;color:#78350F}.bb{background:#DCFCE7;color:#14532D}
+.est-sel{font-size:11px;padding:3px 8px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-weight:600;cursor:pointer}
+.btn-ic{background:none;border:1px solid #E2E8F0;cursor:pointer;color:#94A3B8;padding:5px 8px;border-radius:6px;font-size:13px;display:inline-flex;align-items:center;gap:4px;font-family:Arial}
+.btn-ic:hover{background:#F1F5F9;color:#475569}
+.btn-ic.edit:hover{color:#534AB7;border-color:#C7D2FE;background:#EEF2FF}
+.btn-ic.del:hover{color:#DC2626;border-color:#FECACA;background:#FEF2F2}
+.venc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid #F8FAFC}
+.venc-row:last-child{border-bottom:none}
+.dia-chip{font-size:10px;padding:3px 10px;border-radius:12px;font-weight:700;flex-shrink:0}
+.dr{background:#FEE2E2;color:#7F1D1D}.da{background:#FEF3C7;color:#92400E}.dv{background:#DBEAFE;color:#1E40AF}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:700px;padding:26px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-titulo{font-size:16px;font-weight:700;color:#1E293B;display:flex;align-items:center;gap:8px}
+.modal-close{background:none;border:none;cursor:pointer;font-size:22px;color:#94A3B8;line-height:1;padding:2px 6px;border-radius:5px}
+.modal-close:hover{color:#1E293B;background:#F1F5F9}
+.fsec{border-radius:8px;padding:13px 15px;margin-bottom:12px}
+.fsec-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field{margin-bottom:0}
+.field label{font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;font-size:13px;border:1px solid #E2E8F0;border-radius:7px;font-family:Arial;background:#F8FAFC;color:#1E293B;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#534AB7;background:#fff}
+.field textarea{min-height:66px;resize:vertical;line-height:1.5}
+.modal-footer{display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:16px;border-top:0.5px solid #F1F5F9;flex-wrap:wrap}
+.btn-prim{background:#534AB7;color:#fff;border:none;padding:10px 22px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial}
+.btn-prim:hover{background:#3C3489}
+.btn-sec{background:#F1F5F9;color:#475569;border:none;padding:10px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:Arial}
+.btn-sec:hover{background:#E2E8F0}
+.form-card{background:#fff;border-radius:10px;border:0.5px solid #E5E9F0;padding:24px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.form-titulo{font-size:15px;font-weight:700;color:#1E293B;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.oport-item{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:0.5px solid #F1F5F9}
+.oport-item:last-child{border-bottom:none}
+.oport-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.oport-titulo{font-size:13px;font-weight:600;color:#1E293B}
+.oport-desc{font-size:12px;color:#64748B;margin-top:3px;line-height:1.5}
+.alerta-blk{border-radius:10px;padding:16px;margin-bottom:12px}
+.alerta-plan{padding:9px 12px;background:#fff;border-radius:7px;margin-top:7px;border:0.5px solid rgba(0,0,0,.07);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.alerta-plan-info .titulo{font-size:12px;font-weight:600;color:#1E293B}
+.alerta-plan-info .meta{font-size:11px;color:#64748B;margin-top:2px}
+.empty{text-align:center;padding:40px;color:#94A3B8;font-size:13px}
+.spinner{text-align:center;padding:40px;color:#94A3B8;font-size:13px}
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;color:#fff;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1}
+@media(max-width:700px){
+  .fila2,.f2,.f3{grid-template-columns:1fr}
+  .sec{padding:12px}
+  .modal-overlay{padding:10px}
+  .resp-stats{gap:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="h-brand">
+    <div class="h-logo">📊</div>
+    <div>
+      <div class="h-title">Galaxia — Planes de Acción</div>
+      <div class="h-sub">Del Palacio S.A. · Distribuidora oficial CMQ</div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab on" onclick="goTab('resumen')">📈 Resumen</button>
+  <button class="tab" onclick="goTab('responsables')">👤 Por responsable</button>
+  <button class="tab" onclick="goTab('cargar')">➕ Cargar plan</button>
+  <button class="tab" onclick="goTab('alertas')">🔔 Alertas <span id="alert-badge" style="background:#DC2626;color:#fff;border-radius:10px;font-size:10px;padding:1px 7px;margin-left:4px;display:none">0</span></button>
+  <button class="tab" onclick="goTab('oportunidades')">💡 Oportunidades</button>
+</div>
+
+<!-- RESUMEN -->
+<div id="tab-resumen" class="sec">
+  <div class="kpis" id="kpis-wrap"><div class="spinner">Cargando...</div></div>
+  <div class="fila2">
+    <div>
+      <div class="card">
+        <div class="card-hdr">📅 Próximos vencimientos</div>
+        <div id="venc-lista"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-hdr">🍩 Estado de los planes</div>
+        <div style="position:relative;height:200px"><canvas id="ch-estado" role="img" aria-label="Planes por estado"></canvas></div>
+        <div id="ley-estado" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;font-size:12px;color:#64748B"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">👥 Planes por responsable</div>
+        <div style="position:relative;height:190px"><canvas id="ch-resp" role="img" aria-label="Planes por responsable"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESPONSABLES -->
+<div id="tab-responsables" class="sec" style="display:none">
+  <div id="resp-lista"><div class="spinner">Cargando...</div></div>
+</div>
+
+<!-- CARGAR -->
+<div id="tab-cargar" class="sec" style="display:none">
+  <div class="form-card">
+    <div class="form-titulo">📋 Nuevo plan de acción — modelo 5W1H</div>
+    <div class="fsec" style="background:#F5F3FF;border-left:3px solid #534AB7;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#534AB7">Identificación</div>
+      <div class="f2">
+        <div class="field"><label>Tema / Área de mejora</label><input id="f-tema" type="text" placeholder="Ej: Digitalización, Ejecución en PDV, Coolers..."></div>
+        <div class="field"><label>Prioridad</label><select id="f-prio"><option>Alta</option><option selected>Media</option><option>Baja</option></select></div>
+      </div>
+    </div>
+    <div class="fsec" style="background:#F0FDF4;border-left:3px solid #16A34A;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#166534">Por qué — Diagnóstico y causa raíz</div>
+      <div class="field"><textarea id="f-why" placeholder="¿Qué está fallando? ¿Cuál es el diagnóstico? Cuantificá si es posible (ej: NR BEES en 88%, meta 95%)."></textarea></div>
+    </div>
+    <div class="fsec" style="background:#EFF6FF;border-left:3px solid #2563EB;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#1E40AF">Qué — Acción concreta</div>
+      <div class="field"><textarea id="f-what" placeholder="Usá verbos: Analizar, Implementar, Capacitar, Reducir, Aumentar..."></textarea></div>
+    </div>
+    <div class="fsec" style="background:#FFF7ED;border-left:3px solid #EA580C;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#9A3412">Cómo — Pasos para ejecutarlo</div>
+      <div class="field"><textarea id="f-how" placeholder="Paso 1: ...&#10;Paso 2: ...&#10;Paso 3: ..."></textarea></div>
+    </div>
+    <div class="f3" style="margin-bottom:12px">
+      <div class="field"><label>Quién — Responsable</label><select id="f-who"><option value="">Seleccioná responsable...</option><option>Jose Gonzalez</option><option>Juan Reggiani</option><option>Federico Amaru</option><option>Cristian Lopez</option><option>Pedro Guillemet</option><option>Tamara Praino</option><option>Martina Jorge</option></select></div>
+      <div class="field"><label>Dónde — Zona / PDV / Equipo</label><input id="f-where" type="text" placeholder="Zona, sucursal, equipo..."></div>
+      <div class="field"><label>Indicador de éxito</label><input id="f-kpi" type="text" placeholder="Ej: NR BEES > 95%"></div>
+    </div>
+    <div class="f3" style="margin-bottom:20px">
+      <div class="field"><label>Fecha de inicio</label><input id="f-ini" type="date"></div>
+      <div class="field"><label>Fecha límite</label><input id="f-fin" type="date"></div>
+      <div class="field"><label>Fuente de evidencia</label><input id="f-evidencia" type="text" placeholder="BEES Vision, reporte..."></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn-prim" onclick="guardar()">💾 Guardar plan</button>
+      <span id="saving-txt" style="font-size:12px;color:#94A3B8;display:none">Guardando...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTAS -->
+<div id="tab-alertas" class="sec" style="display:none"><div id="alertas-wrap"></div></div>
+
+<!-- OPORTUNIDADES -->
+<div id="tab-oportunidades" class="sec" style="display:none"><div id="opor-wrap"></div></div>
+
+<!-- MODAL EDICIÓN -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="cerrarModalFondo(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-titulo">✏️ Editar plan de acción</div>
+      <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="fsec" style="background:#F5F3FF;border-left:3px solid #534AB7;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#534AB7">Identificación</div>
+      <div class="f2">
+        <div class="field"><label>Tema / Área de mejora</label><input id="e-tema" type="text"></div>
+        <div class="field"><label>Prioridad</label><select id="e-prio"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+      </div>
+    </div>
+    <div class="fsec" style="background:#F0FDF4;border-left:3px solid #16A34A;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#166534">Por qué — Diagnóstico y causa raíz</div>
+      <div class="field"><textarea id="e-why"></textarea></div>
+    </div>
+    <div class="fsec" style="background:#EFF6FF;border-left:3px solid #2563EB;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#1E40AF">Qué — Acción concreta</div>
+      <div class="field"><textarea id="e-what"></textarea></div>
+    </div>
+    <div class="fsec" style="background:#FFF7ED;border-left:3px solid #EA580C;border-radius:0 8px 8px 0">
+      <div class="fsec-lbl" style="color:#9A3412">Cómo — Pasos para ejecutarlo</div>
+      <div class="field"><textarea id="e-how"></textarea></div>
+    </div>
+    <div class="f3" style="margin-bottom:12px">
+      <div class="field"><label>Quién — Responsable</label><select id="e-who"><option value="">Seleccioná responsable...</option><option>Jose Gonzalez</option><option>Juan Reggiani</option><option>Federico Amaru</option><option>Cristian Lopez</option><option>Pedro Guillemet</option><option>Tamara Praino</option><option>Martina Jorge</option></select></div>
+      <div class="field"><label>Dónde — Zona / PDV</label><input id="e-where" type="text"></div>
+      <div class="field"><label>Indicador de éxito</label><input id="e-kpi" type="text"></div>
+    </div>
+    <div class="f3" style="margin-bottom:4px">
+      <div class="field"><label>Fecha de inicio</label><input id="e-ini" type="date"></div>
+      <div class="field"><label>Fecha límite</label><input id="e-fin" type="date"></div>
+      <div class="field"><label>Fuente de evidencia</label><input id="e-evidencia" type="text"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-prim" onclick="guardarEdicion()">💾 Guardar cambios</button>
+      <button class="btn-sec" onclick="cerrarModal()">Cancelar</button>
+      <span id="edit-saving" style="font-size:12px;color:#94A3B8;display:none">Guardando...</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbyUw_kcEUOpyChsvvH1SljWeCIl6TGQPLPgTy7Xip6zwn0zTPFFAUp9RxFZGaaTpWaqAw/exec';
+const ESTADOS = ['Finalizado','En progreso','Demorado','Pendiente'];
+const EST_COLOR = {Finalizado:'#16A34A','En progreso':'#2563EB',Demorado:'#DC2626',Pendiente:'#94A3B8'};
+const PRIO_CLASS = {Alta:'ba',Media:'bm',Baja:'bb'};
+const AV_COLORS = ['#534AB7','#16A34A','#EA580C','#7C3AED','#DC2626','#0369A1','#0F766E','#B45309'];
+
+let planes=[], users=['Martina Jorge'], currentUser='', chE=null, chR=null, editandoId=null;
+
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=ok?'#1E293B':'#7F1D1D';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+async function apiGet(a){const r=await fetch(`${API_URL}?action=${a}`);return r.json();}
+async function apiPost(b){const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(b)});return r.json();}
+
+async function init(){
+  try{
+    const r=await apiGet('getPlanes');
+    planes=r.planes||[];
+    planes.forEach(p=>{if(p.who&&!users.includes(p.who))users.push(p.who);});
+  }catch(e){
+    console.warn('Sin conexión al servidor, mostrando datos de ejemplo.');
+    planes=demoData();
+  }
+  buildUsers(); renderAll();
+}
+
+function demoData(){
+  const h=new Date(), f=d=>{const x=new Date(h);x.setDate(x.getDate()+d);return x.toISOString().slice(0,10);};
+  return [
+    {id:'1',tema:'Digitalización de clientes',why:'NR BEES en 88%, meta 95%. Clientes clave comprando fuera de la app.',what:'Acompañar a promotores en visita para digitalizar los 20 clientes con mayor volumen.',how:'1. Exportar reporte BEES Vision.\n2. Listar top 20 clientes.\n3. Visitar con promotor.\n4. Medir semanalmente.',who:'Martina Jorge',where:'Zona Norte',fechaIni:f(-10),fechaFin:f(5),kpi:'NR BEES > 95%',evidencia:'BEES Vision',estado:'En progreso',prioridad:'Alta',cargadoPor:'Martina Jorge',cargadoEl:f(-10)},
+    {id:'2',tema:'Foto de éxito en puntos de venta',why:'3 PDV sin foto cargada en el mes.',what:'Capacitar al equipo en carga de foto de éxito y controlar diariamente.',how:'1. Demo en reunión de lunes.\n2. Control diario.\n3. Feedback individual.',who:'Martina Jorge',where:'Todos los PDV',fechaIni:f(-5),fechaFin:f(-2),kpi:'100% PDV con foto',evidencia:'BEES Force',estado:'Demorado',prioridad:'Alta',cargadoPor:'Martina Jorge',cargadoEl:f(-5)},
+    {id:'3',tema:'Efectividad de visitas',why:'Promotores no registran tarea en BEES Force al salir del PDV.',what:'Reforzar el uso de BEES Force para registrar tareas al salir de cada visita.',how:'1. Reporte diario.\n2. Feedback individual.\n3. Reunión semanal.',who:'Martina Jorge',where:'Zona Sur',fechaIni:f(-20),fechaFin:f(-5),kpi:'Efectividad > 85%',evidencia:'Reporte rutas DPO',estado:'Finalizado',prioridad:'Media',cargadoPor:'Martina Jorge',cargadoEl:f(-20)},
+    {id:'4',tema:'Capacitaciones PAC segundo semestre',why:'PAC al 40% de ejecución, meta 80%.',what:'Reorganizar el calendario de capacitaciones del segundo semestre.',how:'1. Relevar disponibilidad.\n2. Reagendar con Gente CMQ.\n3. Confirmar y comunicar.',who:'Martina Jorge',where:'Oficina central',fechaIni:f(-2),fechaFin:f(20),kpi:'Ejecución PAC > 80%',evidencia:'Planilla PAC 2025',estado:'Pendiente',prioridad:'Media',cargadoPor:'Martina Jorge',cargadoEl:f(-2)},
+  ];
+}
+
+function hoy(){return new Date().toISOString().slice(0,10);}
+function dias(f){return f?Math.round((new Date(f)-new Date(hoy()))/86400000):null;}
+function renderAll(){renderResumen();renderResponsables();renderAlertas();renderOportunidades();updateBadge();}
+
+function renderResumen(){
+  const tot=planes.length, fin=planes.filter(p=>p.estado==='Finalizado').length,
+    prog=planes.filter(p=>p.estado==='En progreso').length,
+    dem=planes.filter(p=>p.estado==='Demorado').length,
+    pend=planes.filter(p=>p.estado==='Pendiente').length,
+    venc=planes.filter(p=>p.estado!=='Finalizado'&&p.fechaFin&&p.fechaFin<hoy()).length,
+    pct=tot?Math.round(fin/tot*100):0;
+
+  document.getElementById('kpis-wrap').innerHTML=`
+    <div class="kpi km"><div class="kpi-l">Total de planes</div><div class="kpi-n">${tot}</div></div>
+    <div class="kpi kv"><div class="kpi-l">Finalizados</div><div class="kpi-n">${fin}</div><div class="kpi-s" style="color:#16A34A">tasa: ${pct}%</div></div>
+    <div class="kpi kc"><div class="kpi-l">En ejecución</div><div class="kpi-n">${prog}</div></div>
+    <div class="kpi kp"><div class="kpi-l">Pendientes</div><div class="kpi-n">${pend}</div></div>
+    <div class="kpi kd"><div class="kpi-l">Demorados</div><div class="kpi-n">${dem}</div></div>
+    <div class="kpi kg"><div class="kpi-l">Vencidos abiertos</div><div class="kpi-n">${venc}</div></div>`;
+
+  const prox=planes.filter(p=>p.estado!=='Finalizado'&&p.fechaFin&&p.fechaFin>=hoy())
+    .sort((a,b)=>a.fechaFin.localeCompare(b.fechaFin)).slice(0,7);
+  document.getElementById('venc-lista').innerHTML=prox.length
+    ?prox.map(p=>{
+        const d=dias(p.fechaFin), cls=d<=3?'dr':d<=7?'da':'dv';
+        const txt=d===0?'Vence hoy':d===1?'Mañana':'en '+d+'d';
+        return `<div class="venc-row">
+          <div><div style="font-size:12px;font-weight:600;color:#1E293B">${(p.tema||p.what||'').substring(0,46)}${(p.tema||p.what||'').length>46?'…':''}</div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:1px">${p.who||'—'}</div></div>
+          <span class="dia-chip ${cls}">${txt}</span>
+        </div>`;}).join('')
+    :'<div style="font-size:12px;color:#94A3B8;padding:8px 0">Sin vencimientos próximos</div>';
+
+  renderChEstado(fin,prog,dem,pend);
+  renderChResp();
+}
+
+function renderChEstado(fin,prog,dem,pend){
+  const ctx=document.getElementById('ch-estado'); if(!ctx)return;
+  if(chE)chE.destroy();
+  const data=[fin,prog,dem,pend], labels=['Finalizado','En ejecución','Demorado','Pendiente'], colors=['#16A34A','#2563EB','#DC2626','#94A3B8'];
+  chE=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:3,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}});
+  document.getElementById('ley-estado').innerHTML=labels.map((l,i)=>`
+    <span style="display:flex;align-items:center;gap:5px">
+      <span style="width:10px;height:10px;border-radius:2px;background:${colors[i]}"></span>${l} — ${data[i]}
+    </span>`).join('');
+}
+
+function renderChResp(){
+  const ctx=document.getElementById('ch-resp'); if(!ctx)return;
+  if(chR)chR.destroy();
+  const resps=[...new Set(planes.map(p=>p.who).filter(Boolean))]; if(!resps.length)return;
+  const colors=resps.map((_,i)=>AV_COLORS[i%AV_COLORS.length]);
+  chR=new Chart(ctx,{type:'bar',
+    data:{labels:resps.map(r=>r.split(' ')[0]),datasets:[
+      {label:'Total',data:resps.map(r=>planes.filter(p=>p.who===r).length),backgroundColor:colors.map(c=>c+'30'),borderColor:colors,borderWidth:2,borderRadius:5},
+      {label:'Finalizados',data:resps.map(r=>planes.filter(p=>p.who===r&&p.estado==='Finalizado').length),backgroundColor:colors.map(c=>c+'80'),borderColor:colors,borderWidth:0,borderRadius:5}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'top',labels:{font:{size:11},boxWidth:10,padding:10}}},
+      scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{size:10}},grid:{color:'#F1F5F9'}},x:{ticks:{font:{size:11}},grid:{display:false}}}}});
+}
+
+function planHtml(p){
+  const d=dias(p.fechaFin);
+  const dstr=d===null?'Sin fecha':d<0?`Venció hace ${Math.abs(d)}d`:d===0?'Hoy':d===1?'Mañana':`en ${d}d`;
+  const dcol=d!==null&&d<0?'#DC2626':d!==null&&d<=3?'#EA580C':'#94A3B8';
+  return `<div class="pda-item">
+    <div class="pda-row1">
+      <div class="pda-tema">${p.tema||'Plan de acción'}</div>
+      <div class="badges">
+        <span class="badge ${PRIO_CLASS[p.prioridad]||'bm'}">${p.prioridad||'—'}</span>
+        <select class="est-sel" onchange="cambiarEstado('${p.id}',this.value)" style="color:${EST_COLOR[p.estado]||'#64748B'}">
+          ${ESTADOS.map(e=>`<option ${e===p.estado?'selected':''}>${e}</option>`).join('')}
+        </select>
+        <button class="btn-ic edit" onclick="abrirEdicion('${p.id}')" title="Editar">✏️</button>
+        <button class="btn-ic del" onclick="eliminar('${p.id}')" title="Eliminar">🗑</button>
+      </div>
+    </div>
+    ${p.what?`<div class="pda-titulo">${p.what}</div>`:''}
+    ${p.why?`<div class="pda-desc">Causa raíz: ${p.why.substring(0,120)}${p.why.length>120?'…':''}</div>`:''}
+    <div class="pda-meta">
+      ${p.where?`<span>📍 ${p.where}</span>`:''}
+      <span style="color:${dcol};font-weight:600">📅 ${dstr}</span>
+      ${p.kpi?`<span>🎯 ${p.kpi}</span>`:''}
+      ${p.evidencia?`<span>📎 ${p.evidencia}</span>`:''}
+    </div>
+  </div>`;
+}
+
+function renderResponsables(){
+  const resps=[...new Set(planes.map(p=>p.who).filter(Boolean))];
+  const sinResp=planes.filter(p=>!p.who);
+  const el=document.getElementById('resp-lista');
+  if(!resps.length&&!sinResp.length){el.innerHTML='<div class="empty">Sin planes cargados aún.<br>Andá a "Cargar plan" para empezar.</div>';return;}
+  el.innerHTML=resps.map((r,ri)=>{
+    const rp=planes.filter(p=>p.who===r);
+    const fin=rp.filter(p=>p.estado==='Finalizado').length, prog=rp.filter(p=>p.estado==='En progreso').length,
+      dem=rp.filter(p=>p.estado==='Demorado').length, pend=rp.filter(p=>p.estado==='Pendiente').length;
+    const pct=rp.length?Math.round(fin/rp.length*100):0;
+    const col=AV_COLORS[ri%AV_COLORS.length];
+    const ini=r.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+    return `<div class="resp-card">
+      <div class="resp-top">
+        <div style="display:flex;align-items:center;gap:12px;flex:1">
+          <div class="resp-avatar" style="background:${col}">${ini}</div>
+          <div><div class="resp-nombre">${r}</div><div class="resp-sub">${rp.length} planes · ${pct}% finalizado</div></div>
+        </div>
+        <div class="resp-stats">
+          <div class="rstat"><div class="rstat-n" style="color:#16A34A">${fin}</div><div class="rstat-l">Finaliz.</div></div>
+          <div class="rstat"><div class="rstat-n" style="color:#2563EB">${prog}</div><div class="rstat-l">En curso</div></div>
+          <div class="rstat"><div class="rstat-n" style="color:#DC2626">${dem}</div><div class="rstat-l">Demor.</div></div>
+          <div class="rstat"><div class="rstat-n" style="color:#94A3B8">${pend}</div><div class="rstat-l">Pend.</div></div>
+        </div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>
+      ${rp.sort((a,b)=>(a.fechaFin||'').localeCompare(b.fechaFin||'')).map(p=>planHtml(p)).join('')}
+    </div>`;
+  }).join('')+
+  (sinResp.length?`<div class="resp-card"><div class="resp-top"><div style="display:flex;align-items:center;gap:12px"><div class="resp-avatar" style="background:#94A3B8">?</div><div><div class="resp-nombre">Sin responsable asignado</div><div class="resp-sub">${sinResp.length} planes</div></div></div></div>${sinResp.map(p=>planHtml(p)).join('')}</div>`:'');
+}
+
+function abrirEdicion(id){
+  const p=planes.find(x=>x.id==id); if(!p)return;
+  editandoId=id;
+  ['tema','prio','why','what','how','who','where','kpi','ini','fin','evidencia'].forEach(k=>{
+    const el=document.getElementById('e-'+k); if(!el)return;
+    const map={tema:'tema',prio:'prioridad',why:'why',what:'what',how:'how',who:'who',where:'where',kpi:'kpi',ini:'fechaIni',fin:'fechaFin',evidencia:'evidencia'};
+    el.value=p[map[k]]||'';
+  });
+  document.getElementById('modal').style.display='flex';
+}
+function cerrarModal(){document.getElementById('modal').style.display='none'; editandoId=null;}
+function cerrarModalFondo(e){if(e.target===document.getElementById('modal'))cerrarModal();}
+
+async function guardarEdicion(){
+  if(!editandoId)return;
+  const v=id=>document.getElementById(id)?.value?.trim()||'';
+  if(!v('e-what')||!v('e-who')||!v('e-fin')){alert('Completá al menos: la acción (Qué), el responsable y la fecha límite.');return;}
+  document.getElementById('edit-saving').style.display='inline';
+  const updates={tema:v('e-tema'),prioridad:v('e-prio'),why:v('e-why'),what:v('e-what'),how:v('e-how'),who:v('e-who'),where:v('e-where'),kpi:v('e-kpi'),fechaIni:v('e-ini'),fechaFin:v('e-fin'),evidencia:v('e-evidencia')};
+  const p=planes.find(x=>x.id==editandoId);
+  if(p)Object.assign(p,updates);
+  try{await apiPost({action:'updatePlan',id:editandoId,...updates});}catch(e){}
+  document.getElementById('edit-saving').style.display='none';
+  cerrarModal(); renderAll(); toast('Plan actualizado correctamente');
+}
+
+async function guardar(){
+  const v=id=>document.getElementById(id)?.value?.trim()||'';
+  if(!v('f-what')||!v('f-who')||!v('f-fin')){alert('Completá al menos: la acción (Qué), el responsable y la fecha límite.');return;}
+  document.getElementById('saving-txt').style.display='inline';
+  const plan={tema:v('f-tema'),prioridad:v('f-prio'),why:v('f-why'),what:v('f-what'),how:v('f-how'),who:v('f-who'),where:v('f-where'),kpi:v('f-kpi'),evidencia:v('f-evidencia'),fechaIni:v('f-ini'),fechaFin:v('f-fin'),estado:'Pendiente',cargadoPor:currentUser||v('f-who'),cargadoEl:new Date().toISOString().slice(0,10)};
+  try{
+    const r=await apiPost({action:'addPlan',plan});
+    if(r.ok){planes.push({...plan,id:r.id});toast('Plan guardado en Google Sheets');}
+    else toast('Error al guardar: '+(r.error||'desconocido'),false);
+  }catch(e){plan.id=Date.now().toString();planes.push(plan);toast('Guardado localmente (sin conexión al servidor)');}
+  ['f-tema','f-why','f-what','f-how','f-who','f-where','f-kpi','f-evidencia','f-ini','f-fin'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('saving-txt').style.display='none';
+  renderAll(); goTab('responsables');
+}
+
+async function cambiarEstado(id,estado){
+  const p=planes.find(x=>x.id==id); if(!p)return;
+  p.estado=estado;
+  try{await apiPost({action:'updateEstado',id,estado});}catch(e){}
+  renderAll(); toast('Estado actualizado');
+}
+
+async function eliminar(id){
+  if(!confirm('¿Eliminás este plan de acción? Esta acción no se puede deshacer.'))return;
+  planes=planes.filter(p=>p.id!=id);
+  try{await apiPost({action:'deletePlan',id});}catch(e){}
+  renderAll(); toast('Plan eliminado');
+}
+
+function renderAlertas(){
+  const h=hoy();
+  const grupos=[
+    {tipo:'roja',icono:'⚠️',items:planes.filter(p=>p.estado==='Demorado'),titulo:'Planes demorados',desc:'Requieren atención inmediata. Revisá los plazos o reasigná recursos.'},
+    {tipo:'roja',icono:'⏰',items:planes.filter(p=>p.estado!=='Finalizado'&&p.fechaFin&&p.fechaFin<h),titulo:'Vencidos sin finalizar',desc:'La fecha límite ya pasó y el plan sigue abierto.'},
+    {tipo:'amarilla',icono:'🕐',items:planes.filter(p=>p.estado!=='Finalizado'&&p.fechaFin&&dias(p.fechaFin)!==null&&dias(p.fechaFin)>=0&&dias(p.fechaFin)<=3),titulo:'Vencen en 3 días o menos',desc:'Revisá el avance antes de que venzan.'},
+    {tipo:'amarilla',icono:'📅',items:planes.filter(p=>p.estado!=='Finalizado'&&!p.fechaFin),titulo:'Sin fecha límite definida',desc:'El modelo 5W1H requiere siempre una fecha de compromiso.'},
+    {tipo:'amarilla',icono:'🎯',items:planes.filter(p=>p.estado!=='Finalizado'&&!p.kpi),titulo:'Sin indicador de éxito',desc:'Definí cómo vas a medir si el plan funcionó.'},
+  ].filter(g=>g.items.length>0);
+  const el=document.getElementById('alertas-wrap');
+  if(!grupos.length){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:2.5rem">
+      <div style="font-size:40px;margin-bottom:12px">✅</div>
+      <div style="font-size:16px;font-weight:700;color:#1E293B">Todo en orden</div>
+      <div style="font-size:13px;color:#64748B;margin-top:6px">No hay alertas activas en este momento</div>
+    </div>`;return;
+  }
+  el.innerHTML=grupos.map(g=>{
+    const bg=g.tipo==='roja'?'#FEF2F2':'#FFFBEB', brd=g.tipo==='roja'?'#FCA5A5':'#FDE68A', col=g.tipo==='roja'?'#DC2626':'#D97706';
+    return `<div class="alerta-blk" style="background:${bg};border:1px solid ${brd}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:20px">${g.icono}</span>
+        <div><div style="font-size:13px;font-weight:700;color:${col}">${g.titulo} (${g.items.length})</div>
+        <div style="font-size:12px;color:${col};opacity:.8">${g.desc}</div></div>
+      </div>
+      ${g.items.map(p=>`<div class="alerta-plan">
+        <div class="alerta-plan-info">
+          <div class="titulo">${p.tema||p.what||'Sin descripción'}</div>
+          <div class="meta">${p.who||'Sin responsable'} · ${p.fechaFin||'Sin fecha'}</div>
+        </div>
+        <button class="btn-ic edit" onclick="abrirEdicion('${p.id}')" title="Editar plan">✏️ Editar</button>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderOportunidades(){
+  const tot=planes.length, opors=[];
+  if(!tot)opors.push({col:'#94A3B8',ic:'📄',t:'No hay planes cargados',d:'Cargá el primer plan usando el modelo 5W1H del manual Galaxia.'});
+  const pct=tot?Math.round(planes.filter(p=>p.estado==='Finalizado').length/tot*100):0;
+  if(pct<50&&tot>2)opors.push({col:'#EA580C',ic:'📉',t:`Tasa de cierre baja: ${pct}%`,d:'Menos de la mitad de los planes están finalizados. Revisá si hay bloqueantes o si los plazos son realistas.'});
+  const alta=planes.filter(p=>p.prioridad==='Alta'&&p.estado!=='Finalizado').length;
+  if(alta>0)opors.push({col:'#DC2626',ic:'🔴',t:`${alta} plan${alta>1?'es':''} de prioridad alta sin finalizar`,d:'Los planes de alta prioridad tienen el mayor impacto. Enfocá los recursos acá primero.'});
+  const sinHow=planes.filter(p=>!p.how&&p.estado!=='Finalizado').length;
+  if(sinHow>0)opors.push({col:'#D97706',ic:'🔧',t:`${sinHow} plan${sinHow>1?'es':''} sin pasos de ejecución (Cómo)`,d:'El manual Galaxia requiere pasos claros para hacer seguimiento parcial. Editá el plan con el ícono de lápiz.'});
+  const resps=[...new Set(planes.map(p=>p.who).filter(Boolean))];
+  if(resps.length===1&&tot>3)opors.push({col:'#0369A1',ic:'👤',t:'Todos los planes están asignados a una sola persona',d:'Considerá distribuir la carga entre los referentes del equipo.'});
+  const dem=planes.filter(p=>p.estado==='Demorado').length;
+  if(dem>0)opors.push({col:'#7C3AED',ic:'⏸️',t:`${dem} plan${dem>1?'es':''} demorado${dem>1?'s':''}`,d:'Revisá si podés redefinir el alcance o el plazo. Editá el plan con el ícono de lápiz.'});
+  const sinDesc=planes.filter(p=>!p.why&&p.estado!=='Finalizado').length;
+  if(sinDesc>0)opors.push({col:'#64748B',ic:'📝',t:`${sinDesc} plan${sinDesc>1?'es':''} sin diagnóstico documentado`,d:'Documentar la causa raíz permite aprender de los problemas y evitar que se repitan.'});
+  const el=document.getElementById('opor-wrap');
+  if(!opors.length){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:2.5rem">
+      <div style="font-size:40px;margin-bottom:12px">🏆</div>
+      <div style="font-size:16px;font-weight:700;color:#1E293B">Gestión excelente</div>
+      <div style="font-size:13px;color:#64748B;margin-top:6px">No se detectaron oportunidades de mejora</div>
+    </div>`;return;
+  }
+  el.innerHTML='<div class="card"><div class="card-hdr">💡 Oportunidades de mejora detectadas automáticamente</div>'+
+    opors.map(o=>`<div class="oport-item">
+      <div class="oport-ic" style="background:${o.col}15;font-size:18px">${o.ic}</div>
+      <div><div class="oport-titulo">${o.t}</div><div class="oport-desc">${o.d}</div></div>
+    </div>`).join('')+'</div>';
+}
+
+function updateBadge(){
+  const h=hoy(), n=planes.filter(p=>
+    p.estado==='Demorado'||
+    (p.estado!=='Finalizado'&&p.fechaFin&&p.fechaFin<h)||
+    (p.estado!=='Finalizado'&&p.fechaFin&&dias(p.fechaFin)>=0&&dias(p.fechaFin)<=3)
+  ).length;
+  const b=document.getElementById('alert-badge');
+  b.textContent=n; b.style.display=n>0?'inline':'none';
+}
+
+function goTab(t){
+  ['resumen','responsables','cargar','alertas','oportunidades'].forEach(id=>document.getElementById('tab-'+id).style.display='none');
+  document.getElementById('tab-'+t).style.display='block';
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.tab')[{resumen:0,responsables:1,cargar:2,alertas:3,oportunidades:4}[t]].classList.add('on');
+}
+
+function buildUsers(){
+  const sel=document.getElementById('sel-user'), cur=sel.value;
+  sel.innerHTML='<option value="">Seleccioná tu nombre</option>';
+  users.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u;sel.appendChild(o);});
+  const a=document.createElement('option');a.value='__new__';a.textContent='+ Agregar persona...';sel.appendChild(a);
+  if(cur&&cur!=='__new__')sel.value=cur;
+}
+
+document.getElementById('sel-user').addEventListener('change',function(){
+  if(this.value==='__new__'){
+    document.getElementById('inp-user').style.display='inline-block';
+    document.getElementById('btn-adduser').style.display='inline-block';
+    this.value='';
+  } else {
+    currentUser=this.value;
+    const wi=document.getElementById('f-who');
+    if(wi&&!wi.value)wi.value=currentUser;
+  }
+});
+document.getElementById('btn-adduser').addEventListener('click',function(){
+  const v=document.getElementById('inp-user').value.trim(); if(!v)return;
+  if(!users.includes(v))users.push(v);
+  buildUsers();
+  document.getElementById('sel-user').value=v; currentUser=v;
+  document.getElementById('inp-user').style.display='none';
+  this.style.display='none';
+  document.getElementById('inp-user').value='';
+});
+
+buildUsers(); init();
+</script>
+</body>
+</html>
